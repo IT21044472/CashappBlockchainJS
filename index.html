@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Blockchain Transaction</title>
+</head>
+<body>
+  <h1>Blockchain Transaction</h1>
+  <div>
+    <label for="amount">Amount:</label>
+    <input type="number" id="amount" />
+  </div>
+  <button onclick="addTransaction()">Add Transaction</button>
+  <h2>Blockchain</h2>
+  <pre id="blockchainOutput"></pre>
+
+  <script>
+    class Block {
+      constructor(timestamp, data, previousHash = '') {
+        this.timestamp = timestamp;
+        this.data = data;
+        this.previousHash = previousHash;
+        this.hash = this.calculateHash();
+      }
+
+      calculateHash() {
+      }
+    }
+
+    class Blockchain {
+      constructor() {
+        this.chain = [this.createGenesisBlock()];
+      }
+
+      createGenesisBlock() {
+        return new Block("01/01/2023", "Genesis Block", "0");
+      }
+
+      getLatestBlock() {
+        return this.chain[this.chain.length - 1];
+      }
+
+      addBlock(newBlock) {
+        newBlock.previousHash = this.getLatestBlock().hash;
+        newBlock.hash = newBlock.calculateHash();
+        this.chain.push(newBlock);
+      }
+
+      isChainValid() {
+        for (let i = 1; i < this.chain.length; i++) {
+          const currentBlock = this.chain[i];
+          const previousBlock = this.chain[i - 1];
+
+          if (currentBlock.hash !== currentBlock.calculateHash()) {
+            return false;
+          }
+
+          if (currentBlock.previousHash !== previousBlock.hash) {
+            return false;
+          }
+        }
+
+        return true;
+      }
+    }
+
+    const myBlockchain = new Blockchain();
+
+    function addTransaction() {
+      const amount = document.getElementById("amount").value;
+      const timestamp = new Date().toLocaleString();
+      const data = { amount };
+      const newBlock = new Block(timestamp, data);
+      myBlockchain.addBlock(newBlock);
+
+      const blockchainOutput = document.getElementById("blockchainOutput");
+      blockchainOutput.textContent = JSON.stringify(myBlockchain.chain, null, 2);
+    }
+  </script>
+</body>
+</html>
